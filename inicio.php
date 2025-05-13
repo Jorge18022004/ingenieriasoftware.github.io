@@ -1,12 +1,12 @@
 <?php
 
 require 'config/database.php';
-session_start();  // Asegúrate de iniciar la sesión si estás usando el carrito basado en sesión
+session_start();
 
 $db = new database();
 $con = $db->conectar();
 
-$sql = $con->prepare("SELECT id, nombre, precio FROM productos WHERE activo=1 ORDER BY RAND() LIMIT 4");
+$sql = $con->prepare("SELECT id, nombre, precio, cantidad FROM productos WHERE activo=1 ORDER BY fecha DESC LIMIT 4");
 $sql->execute();
 $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
 
@@ -171,7 +171,7 @@ $cantidad_carrito = count($productos_carrito);
     <div id="contenedor">
         <header>
             <div id="logo">
-                <img src="Imagenes/logo2.png" alt="Logo Tienda">
+                <img src="imagenes/bolsos_chic.png" alt="Logo Tienda">
             </div>
             <div id="slogan">
                 <h1>Tu bolso ideal te espera aquí</h1>
@@ -183,7 +183,7 @@ $cantidad_carrito = count($productos_carrito);
             <a href="producto.php">Productos</a>
             <a href="categorias.html">Categorías</a>
             <a href="carrito.php">Carrito (<?php echo $cantidad_carrito; ?>)</a>
-            <a href="contacto.html">Contacto</a>
+            <a href="contacto.php">Contacto</a>
         </nav>
 
     <main>
@@ -217,6 +217,11 @@ $cantidad_carrito = count($productos_carrito);
                     <div class="product">
                         <img src="imagenes/productos/<?php echo $row['id']; ?>.jpg" alt="<?php echo htmlspecialchars($row['nombre']); ?>">
                         <div class="product-description"><?php echo htmlspecialchars($row['nombre']); ?></div>
+                        <div><?php 
+    $cantidad = (int)$row['cantidad']; // Nos aseguramos de que sea un número entero
+    echo htmlspecialchars($cantidad) . ' ' . ($cantidad === 1 ? 'Disponible' : 'Disponibles');
+    ?>
+    </div>
                         <div class="price">$<?php echo number_format($row['precio'], 2); ?> MXN</div>
                         <form action="agregar_carrito.php" method="post">
                             <input type="hidden" name="id" value="<?php echo $row['id']; ?>">

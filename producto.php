@@ -5,7 +5,7 @@ $db = new database();
 $con = $db->conectar();
 session_start();
 
-$sql = $con->prepare("SELECT id, nombre, precio FROM productos WHERE activo=1");
+$sql = $con->prepare("SELECT id, nombre, precio, cantidad FROM productos WHERE activo=1 AND cantidad > 0");
 $sql->execute();
 $resultado = $sql->fetchAll(PDO::FETCH_ASSOC);
 
@@ -171,7 +171,7 @@ $cantidad_carrito = count($productos_carrito);
     <div id="contenedor">
         <header>
             <div id="logo">
-                <img src="Imagenes/logo2.png" alt="Logo Tienda">
+                <img src="imagenes/bolsos_chic.png" alt="Logo Tienda">
             </div>
             <div id="slogan">
                 <h1>Tu bolso ideal te espera aquí</h1>
@@ -183,16 +183,24 @@ $cantidad_carrito = count($productos_carrito);
             <a href="producto.php">Productos</a>
             <a href="categorias.html">Categorías</a>
             <a href="carrito.php">Carrito (<?php echo $cantidad_carrito; ?>)</a>
-            <a href="contacto.html">Contacto</a>
+            <a href="contacto.php">Contacto</a>
         </nav>
 
         <main>
-            <h1>Productos Destacados</h1>
+            <?php if (empty($resultado)) : ?>
+    <p style="text-align: center; font-size: 18px; color: #777;">No hay productos disponibles en este momento.</p>
+<?php endif; ?>            <h1>Productos</h1>
             <div class="product-grid">
                 <?php foreach($resultado as $row) { ?>
                     <div class="product">
                         <img src="imagenes/productos/<?php echo $row['id']; ?>.jpg" alt="<?php echo htmlspecialchars($row['nombre']); ?>">
                         <div class="product-description"><?php echo htmlspecialchars($row['nombre']); ?></div>
+                        <div class="product-description">
+    <?php 
+    $cantidad = (int)$row['cantidad']; // Nos aseguramos de que sea un número entero
+    echo htmlspecialchars($cantidad) . ' ' . ($cantidad === 1 ? 'Disponible' : 'Disponibles');
+    ?>
+</div>
                         <div class="price">$<?php echo number_format($row['precio'], 2); ?> MXN</div>
                         <form action="agregar_carrito.php" method="post">
                             <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
